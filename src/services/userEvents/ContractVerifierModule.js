@@ -34,7 +34,7 @@ export function ContractVerifierModule (db, collections, { url }, { log }) {
           break
         // verification result
         case 'verify':
-          const result = (data) ? data.result : null
+          let result = (data) ? data.result : null
           let { _id, address } = request
           if (!_id) throw new Error(`Missing _id {$request}`)
           _id = ObjectID(_id)
@@ -42,6 +42,7 @@ export function ContractVerifierModule (db, collections, { url }, { log }) {
           // Update verification
           const match = checkResult(result || {})
           log.debug(`Updating verification ${_id}`)
+          result = serializeResult(result)
           const res = await collection.updateOne({ _id }, { $set: { error, result, match } })
           if (!res.result.ok) throw new Error(`Error updating verification ${_id}`)
 
@@ -136,6 +137,14 @@ export function extractUsedSourcesFromRequest ({ source, imports }, { usedSource
     const { contents } = imp
     return { name, contents }
   })
+}
+
+function serializeResult (result) {
+  let newResult = {}
+  for (let key in result) {
+    newResult[key] = JSON.stringify(result[key])
+  }
+  return newResult
 }
 
 export default ContractVerifierModule
