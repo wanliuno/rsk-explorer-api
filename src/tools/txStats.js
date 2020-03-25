@@ -34,10 +34,27 @@ async function getData (fromBlock, toBlock) {
       getTxData(tx)
     })
     printObj(DATA)
+
+    let fb = await getBlock(collections, fromBlock)
+    let tb = await getBlock(collections, toBlock)
+    let diff = getDiff(fb, tb)
+
+    printObj(diff)
+
     process.exit(0)
   } catch (err) {
     console.error(err)
     process.exit(9)
+  }
+}
+
+async function getBlock ({ Blocks }, number) {
+  try {
+    let query = { number }
+    let data = await Blocks.findOne(query)
+    return data
+  } catch (err) {
+    return Promise.reject(err)
   }
 }
 
@@ -52,6 +69,13 @@ function getTxData (tx) {
   DATA.gasPrice = DATA.gasPrice.plus(gasPrice)
   DATA.gasUsed = DATA.gasUsed.plus(gasUsed)
   DATA.fee = DATA.fee.plus(fee)
+}
+
+function getDiff (from, to) {
+  let time = to.timestamp - from.timestamp
+  let difficulty = newBigNumber(to.totalDifficulty).minus(newBigNumber(from.totalDifficulty))
+  let hashrate = difficulty.dividedBy(newBigNumber(time))
+  return { time, difficulty, hashrate }
 }
 
 function help (msg) {
