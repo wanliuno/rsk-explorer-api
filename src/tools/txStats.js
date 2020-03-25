@@ -62,7 +62,7 @@ function getTxData (tx) {
   let { gas, gasPrice, receipt } = tx
   let { gasUsed } = receipt
   gas = newBigNumber(gas)
-  gasPrice = newBigNumber(gasPrice)
+  gasPrice = toWei(gasPrice)
   gasUsed = newBigNumber(gasUsed)
   let fee = gasUsed.multipliedBy(gasPrice)
   DATA.gas = DATA.gas.plus(gas)
@@ -87,6 +87,10 @@ function help (msg) {
   console.log(`Example: node ${myName} 100 200`)
   console.log('')
   process.exit(0)
+}
+
+function toWei (value) {
+  return newBigNumber(value).dividedBy(newBigNumber(10 ** 18))
 }
 
 function printObj (obj) {
