@@ -1,11 +1,14 @@
 import dataSource from '../lib/dataSource.js'
 import { getDbBlocksCollections } from '../lib/blocksCollections'
-import { newBigNumber, serialize } from '../lib/utils'
+import { newBigNumber } from '../lib/utils'
+import { inspect } from 'util'
+
 // import { info, orange, reset, error, ansiCode } from '../lib/cli'
 const fromBlock = parseInt(process.argv[2])
 const toBlock = parseInt(process.argv[3])
 if (!fromBlock || !toBlock) help()
 if (fromBlock > toBlock) help(`'fromBlock' must be less than 'toBlock'`)
+
 const DATA = {
   txs: 0,
   gas: newBigNumber(0),
@@ -13,6 +16,8 @@ const DATA = {
   gasUsed: newBigNumber(0),
   fee: newBigNumber(0)
 }
+const accounts = {}
+
 console.log(`from block: ${fromBlock} to block: ${toBlock}`)
 getData(fromBlock, toBlock)
 
@@ -34,6 +39,8 @@ async function getData (fromBlock, toBlock) {
       getTxData(tx)
     })
     printObj(DATA)
+    printObj(accounts)
+    console.log(`Accounts that sent txs: ${Object.keys(accounts).length}`)
 
     let fb = await getBlock(collections, fromBlock)
     let tb = await getBlock(collections, toBlock)
@@ -59,7 +66,9 @@ async function getBlock ({ Blocks }, number) {
 }
 
 function getTxData (tx) {
-  let { gas, gasPrice, receipt } = tx
+  let { gas, gasPrice, receipt, from } = tx
+  let fromTxs = accounts[from] || 0
+  accounts[from] = fromTxs + 1
   let { gasUsed } = receipt
   gas = newBigNumber(gas)
   gasPrice = toWei(gasPrice)
@@ -98,5 +107,5 @@ function printObj (obj) {
   for (let p in o) {
     o[p] = o[p].toString(10)
   }
-  console.log(o)
+  console.log(JSON.stringify(o, null, 2))
 }
