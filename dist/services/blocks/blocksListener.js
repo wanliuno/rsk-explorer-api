@@ -5,10 +5,11 @@ var _Logger = _interopRequireDefault(require("../../lib/Logger"));function _inte
 
 const config = Object.assign({}, _config.default.blocks);
 const log = (0, _Logger.default)('Blocks', config.log);
+config.log = log;
 
 (0, _dataSource.setup)({ log }).then(({ db }) => {
   config.Logger = log;
-  const listener = new _ListenBlocks.ListenBlocks(db, { log });
+  const listener = new _ListenBlocks.ListenBlocks(db, config);
   log.info(`Starting blocks listener`);
   listener.start();
 });

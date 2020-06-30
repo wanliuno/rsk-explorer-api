@@ -7,7 +7,6 @@ var _Logger = _interopRequireDefault(require("../../lib/Logger"));
 var _config = _interopRequireDefault(require("../../lib/config"));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
 
 const config = Object.assign({}, _config.default.blocks);
-
 const log = (0, _Logger.default)('Blocks', config.log);
 
 (0, _dataSource.dataSource)().then(({ db, initConfig }) => {

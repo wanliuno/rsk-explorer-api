@@ -1,4 +1,4 @@
-"use strict";Object.defineProperty(exports, "__esModule", { value: true });var _exportNames = { bigNumberDoc: true, isBigNumber: true, serializeBigNumber: true, isSerializedBigNumber: true, unSerializeBigNumber: true, bigNumberToSring: true, bigNumberSum: true, bigNumberDifference: true, newBigNumber: true, isObj: true, serialize: true, checkBlockHash: true, isBlockHash: true, blockQuery: true, getBestBlock: true, applyDecimals: true, isValidBlockNumber: true, isBlockObject: true, toAscii: true };exports.toAscii = exports.isBlockObject = exports.isValidBlockNumber = exports.applyDecimals = exports.getBestBlock = exports.blockQuery = exports.isBlockHash = exports.checkBlockHash = exports.serialize = exports.isObj = exports.newBigNumber = exports.bigNumberDifference = exports.bigNumberSum = exports.bigNumberToSring = exports.unSerializeBigNumber = exports.isSerializedBigNumber = exports.serializeBigNumber = exports.isBigNumber = exports.bigNumberDoc = void 0;var _bignumber = require("bignumber.js");
+"use strict";Object.defineProperty(exports, "__esModule", { value: true });var _exportNames = { bigNumberDoc: true, isBigNumber: true, serializeBigNumber: true, isSerializedBigNumber: true, unSerializeBigNumber: true, bigNumberToSring: true, bigNumberSum: true, bigNumberDifference: true, newBigNumber: true, isObj: true, serialize: true, checkBlockHash: true, isBlockHash: true, blockQuery: true, getBestBlock: true, applyDecimals: true, isValidBlockNumber: true, isBlockObject: true, toAscii: true, quantityMarks: true };exports.quantityMarks = exports.toAscii = exports.isBlockObject = exports.isValidBlockNumber = exports.applyDecimals = exports.getBestBlock = exports.blockQuery = exports.isBlockHash = exports.checkBlockHash = exports.serialize = exports.isObj = exports.newBigNumber = exports.bigNumberDifference = exports.bigNumberSum = exports.bigNumberToSring = exports.unSerializeBigNumber = exports.isSerializedBigNumber = exports.serializeBigNumber = exports.isBigNumber = exports.bigNumberDoc = void 0;var _bignumber = require("bignumber.js");
 var _types = require("./types");
 var _mongodb = require("mongodb");
 var _rskUtils = require("rsk-utils");
@@ -125,3 +125,11 @@ const isBlockObject = block => {
 };exports.isBlockObject = isBlockObject;
 
 const toAscii = hexString => (0, _rskUtils.toBuffer)((0, _rskUtils.remove0x)(hexString), 'hex').toString('ascii').replace(/\0/g, '');exports.toAscii = toAscii;
+
+const quantityMarks = (quantity, unit, mark = '*') => {
+  quantity = parseInt(quantity);
+  unit = parseInt(unit);
+  if (isNaN(quantity) || isNaN(unit)) return '';
+  let steps = Math.floor(quantity / unit);
+  return Array(++steps).join(mark);
+};exports.quantityMarks = quantityMarks;

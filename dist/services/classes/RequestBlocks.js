@@ -10,13 +10,14 @@ class Emitter extends _events.EventEmitter {}
 
 class RequestBlocks extends _BlocksBase.BlocksBase {
   constructor(db, options) {
-    let { log, initConfig } = options;
-    super(db, { log, initConfig });
+    let { log, initConfig, debug } = options;
+    super(db, { log, initConfig, debug });
     this.queueSize = options.blocksQueueSize || 50;
     this.pending = new Set();
     this.requested = new Map();
     this.events = options.noEvents ? null : new Emitter();
     this.maxRequestTime = 1000;
+    this.updateTokenBalances = options.updateTokenBalances;
   }
 
   emit(event, data) {
@@ -92,8 +93,13 @@ class RequestBlocks extends _BlocksBase.BlocksBase {
       }
       hash = hash || hashOrNumber;
       const { nod3, collections, log, initConfig } = this;
-      let block = await getBlock(hash, { nod3, collections, log, initConfig });
-      return block;
+      let result = await getBlock(hash, { nod3, collections, log, initConfig });
+
+      if (this.updateTokenBalances) {
+        let { block } = result;
+        if (block) await (0, _UpdateTokenAccountBalances.updateTokenAccountBalances)(block, { nod3, collections, initConfig, log });
+      }
+      return result;
     } catch (err) {
       return Promise.reject(err);
     }
@@ -107,7 +113,7 @@ class RequestBlocks extends _BlocksBase.BlocksBase {
     if (res && res.block) {
       let block = res.block;
       this.emit(_types.events.NEW_BLOCK, { key, block });
-      return res.block;
+      res = undefined;
     }
     this.processPending();
   }
@@ -135,21 +141,16 @@ class RequestBlocks extends _BlocksBase.BlocksBase {
 
 
 async function getBlock(hashOrNumber, { nod3, collections, log, initConfig }) {
-  if ((0, _utils.isBlockHash)(hashOrNumber)) {
-    let block = await (0, _Block.getBlockFromDb)(hashOrNumber, collections.Blocks);
-    if (block) return { block, key: hashOrNumber };
-  }
+  if (hashOrNumber !== 0 && !(0, _utils.isBlockHash)(hashOrNumber)) throw new Error(`Invalid blockHash: ${hashOrNumber}`);
+  const key = hashOrNumber;
   try {
     let newBlock = new _Block.Block(hashOrNumber, { nod3, collections, log, initConfig });
-    let block = await newBlock.save().then(async res => {
-      if (!res || !res.data) return;
-      let block = res.data.block;
-      await (0, _UpdateTokenAccountBalances.updateTokenAccountBalances)(block, { nod3, collections, initConfig, log });
-      return block;
-    });
-    return { block, key: hashOrNumber };
+    let result = await newBlock.save();
+    if (!result || !result.data) return { key };
+    let { block } = result.data;
+    return { block, key };
   } catch (error) {
-    return { error, key: hashOrNumber };
+    return { error, key };
   }
 }var _default =
 

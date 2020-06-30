@@ -3,7 +3,8 @@ var _config = _interopRequireDefault(require("./config"));
 var _Db = _interopRequireDefault(require("./Db.js"));
 var _StoredConfig = require("./StoredConfig");
 var _nod3Connect = _interopRequireDefault(require("./nod3Connect"));
-var _initialConfiguration = _interopRequireDefault(require("./initialConfiguration"));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
+var _initialConfiguration = _interopRequireDefault(require("./initialConfiguration"));
+var _blocksCollections = require("./blocksCollections");function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}
 
 const dataBase = new _Db.default(_config.default.db);exports.dataBase = dataBase;
 
@@ -22,8 +23,8 @@ async function Setup({ log } = {}) {
   const db = await dataBase.db();
   const storedConfig = (0, _StoredConfig.StoredConfig)(db);
 
-  const createCollections = async () => {
-    const names = _config.default.collectionsNames;
+  const createCollections = async names => {
+    names = names || _config.default.collectionsNames;
     const validate = _config.default.blocks.validateCollections;
     return dataBase.createCollections(_collections.default, { names, validate });
   };
@@ -59,18 +60,24 @@ async function Setup({ log } = {}) {
     }
   };
 
+  const getCollections = db => {
+    return (0, _blocksCollections.getDbBlocksCollections)(db);
+  };
+
   const start = async skipCheck => {
     try {
       let initConfig;
       if (skipCheck) initConfig = await storedConfig.getConfig();else
       initConfig = await checkSetup();
       if (!initConfig) throw new Error(`invalid init config, run checkSetup first`);
-      return { initConfig, db };
+      const collections = await getCollections(db);
+      return { initConfig, db, collections };
     } catch (err) {
       log.error(err);
       process.exit(9);
     }
   };
+
   return Object.freeze({ start, createCollections, checkSetup, getInitConfig });
 }var _default =
 

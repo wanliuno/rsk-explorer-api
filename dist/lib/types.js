@@ -4,7 +4,8 @@ const txTypes = {
   default: 'normal',
   remasc: 'remasc',
   bridge: 'bridge',
-  contract: 'contract deploy' };exports.txTypes = txTypes;
+  contract: 'contract deploy',
+  call: 'contract call' };exports.txTypes = txTypes;
 
 
 const errors = (0, _errors.apiErrors)(
@@ -64,7 +65,9 @@ const MODULES = {
   summary: 'Summary',
   txPending: 'TxPending',
   extendedStats: 'ExtendedStats',
-  contractVerifier: 'ContractVerification' };exports.MODULES = MODULES;
+  contractVerifier: 'ContractVerification',
+  internalTransactions: 'InternalTx',
+  balances: 'Balances' };exports.MODULES = MODULES;
 
 
 const BIG_NUMBER = 'BigNumber';exports.BIG_NUMBER = BIG_NUMBER;
@@ -74,7 +77,9 @@ const OBJECT_ID = 'ObjectID';exports.OBJECT_ID = OBJECT_ID;
 const TOTAL_SUPPLY = 21 * 10 ** 6;exports.TOTAL_SUPPLY = TOTAL_SUPPLY;
 
 const fields = {
-  LAST_BLOCK_MINED: 'lastBlockMined' };exports.fields = fields;
+  LAST_BLOCK_MINED: 'lastBlockMined',
+  DEPLOYED_CODE: 'deployedCode',
+  CREATED_BY_TX: 'createdByTx' };exports.fields = fields;
 
 
 const EVMversions = [
