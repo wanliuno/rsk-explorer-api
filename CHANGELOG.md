@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- Token totalSupply & decimals serialization
+
+### Added
+
+- Get balances of all addresses obtained by the block summaries for that block number.  
+
 ## [1.1.5] - 2020-08-11
 
 ## Added
